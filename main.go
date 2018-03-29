@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ChefBot/mux"
+	"ChefBot/Mux"
 	"flag"
 	"fmt"
 	"os"
@@ -19,7 +19,7 @@ var (
 	Token string
 
 	// Router will be the multiplexer for all of the commands
-	Router = mux.New()
+	Router = Mux.New()
 )
 
 func init() {

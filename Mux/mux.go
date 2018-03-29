@@ -1,4 +1,4 @@
-package mux
+package Mux
 
 import (
 	"errors"
@@ -90,7 +90,7 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 	// TODO Add server specific prefixes
 	// If the message does not start with the bot prefix do nothing
 	if !strings.HasPrefix(ctx.Content, m.Prefix) {
-		log.Printf("Message missing bot prefix, ", ctx.Content)
+		log.Printf("Message missing bot prefix, %v", ctx.Content)
 		return
 	}
 
@@ -122,7 +122,7 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 
 	// Run the route that was found
 	r, err := m.Match(ctx.Content)
-	if err != nil {
+	if err == nil {
 		r.Run(ds, mc.Message, ctx)
 		return
 	}
