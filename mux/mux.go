@@ -1,6 +1,7 @@
 package mux
 
 import (
+	"errors"
 	"log"
 	"strings"
 
@@ -57,10 +58,24 @@ func (m *Mux) Route(pattern, desc string, cb HandlerFunc) (*Route, error) {
 	return &r, nil
 }
 
+// Match attempts to find the route for the given message
+func (m *Mux) Match(msg string) (*Route, error) {
+
+	// Tokenize the msg string into a slice of words
+	command := strings.Fields(msg)[0]
+
+	for _, routeValue := range m.Routes {
+		if routeValue.Pattern == command {
+			return routeValue, nil
+		}
+	}
+
+	return nil, errors.New("No route found")
+}
+
 // OnMessageCreate is a DiscordGo Event Handler function. This function will
 // recieve all Discord message and parse themm for matches to registed routes.
 func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate) {
-	var err error
 
 	// Ignore all messages created by the Bot
 	if mc.Author.ID == ds.State.User.ID {
@@ -72,6 +87,7 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 		Content: strings.TrimSpace(mc.Content),
 	}
 
+	// TODO Add server specific prefixes
 	// If the message does not start with the bot prefix do nothing
 	if !strings.HasPrefix(ctx.Content, m.Prefix) {
 		log.Printf("Message missing bot prefix, ", ctx.Content)
@@ -80,6 +96,8 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 
 	// Fetch the channel for this Message
 	var c *discordgo.Channel
+	var err error
+
 	c, err = ds.State.Channel(mc.ChannelID)
 	if err != nil {
 		// Try fetching via REST API
@@ -101,4 +119,14 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 			}
 		}
 	}
+
+	// Run the route that was found
+	r, err := m.Match(ctx.Content)
+	if err != nil {
+		r.Run(ds, mc.Message, ctx)
+		return
+	}
+
+	log.Printf(err.Error())
+	// TODO Add a help message mentioning the unkown command
 }
