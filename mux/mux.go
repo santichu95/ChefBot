@@ -74,7 +74,7 @@ func (m *Mux) Match(msg string) (*Route, error) {
 }
 
 // OnMessageCreate is a DiscordGo Event Handler function. This function will
-// recieve all Discord message and parse themm for matches to registed routes.
+// receive all Discord message and parse themm for matches to registered routes.
 func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate) {
 
 	// Ignore all messages created by the Bot
@@ -128,5 +128,5 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 	}
 
 	log.Printf(err.Error())
-	// TODO Add a help message mentioning the unkown command
+	// TODO Add a help message mentioning the unknown command
 }
