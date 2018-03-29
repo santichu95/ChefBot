@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ChefBot/mux"
 	"flag"
 	"fmt"
 	"os"
@@ -36,15 +37,13 @@ func main() {
 		return
 	}
 
-	dg.AddHandler(Router.OnMessageCreate)
-
-	Router.Route("help", "Display this message", Router.Help)
-
 	err = dg.Open()
 	if err != nil {
 		fmt.Println("error opening connection,", err)
 		return
 	}
+
+	dg.AddHandler(Router.OnMessageCreate)
 
 	fmt.Println("Bot is now running. Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
