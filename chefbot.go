@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ChefBot/Mux"
+	mux "ChefBot/Mux"
 	"flag"
 	"fmt"
 	"os"
@@ -19,15 +19,18 @@ var (
 	Token string
 
 	// Router will be the multiplexer for all of the commands
-	Router = Mux.New()
+	Router = mux.New()
 )
 
 func init() {
 	Token = os.Getenv("DG_TOKEN")
+
 	if Token == "" {
 		flag.StringVar(&Token, "t", "", "Discord Authentication Token")
 		flag.Parse()
 	}
+
+	mux.AddAllCommands(Router)
 }
 
 func main() {

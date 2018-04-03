@@ -1,6 +1,8 @@
-package Mux
+package mux
 
 import (
+	"database/sql"
+	"database/sql/driver"
 	"errors"
 	"log"
 	"strings"
@@ -34,9 +36,10 @@ type HandlerFunc func(*discordgo.Session, *discordgo.Message, *Context)
 
 // Mux is the main struct for all mux methods.
 type Mux struct {
-	Routes  []*Route
-	Default *Route
-	Prefix  string
+	Routes             []*Route
+	Default            *Route
+	Prefix             string
+	DatabaseConnection driver.Conn
 }
 
 // New returns a new Discord message route mux
@@ -44,6 +47,23 @@ func New() *Mux {
 	m := &Mux{}
 	m.Prefix = "*"
 	return m
+}
+
+// ConnectDB will connect the multiplexer to a database that holds information
+// about the users on the discord server
+func (m *Mux) ConnectDB(filename string) {
+	DatabaseConnection, err := sql.Open("mysql", "user:password@/dbname")
+
+	if err != nil {
+		log.Printf("Error opening database")
+	}
+
+	err = DatabaseConnection.Ping()
+
+	if err != nil {
+		log.Printf("Error connecting to database")
+	}
+
 }
 
 // Route allows you to register a route
@@ -65,7 +85,7 @@ func (m *Mux) Match(msg string) (*Route, error) {
 	command := strings.Fields(msg)[0]
 
 	for _, routeValue := range m.Routes {
-		if routeValue.Pattern == command {
+		if routeValue.Pattern == command[1:] {
 			return routeValue, nil
 		}
 	}
@@ -129,4 +149,11 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 
 	log.Printf(err.Error())
 	// TODO Add a help message mentioning the unknown command
+}
+
+// TODO Create a way to groups the routes, i.e. not list every single route
+
+// ListRoutes will list all of the routes into the chat
+func (m *Mux) ListRoutes(ds *discordgo.Session) {
+	log.Printf("Printing all of the routes to chat")
 }
