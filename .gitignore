@@ -14,5 +14,5 @@
 .glide/
 
 # Secret files containing passwords and username for database.
-.secret
+*.secret
 
