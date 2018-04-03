@@ -1,0 +1,7 @@
+use chefbot;
+
+CREATE TABLE IF NOT EXISTS Currency (
+    ID int NOT NULL,
+    Value int,
+    PRIMARY KEY (ID)
+);

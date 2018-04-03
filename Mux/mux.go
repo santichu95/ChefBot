@@ -3,11 +3,16 @@ package mux
 import (
 	"database/sql"
 	"database/sql/driver"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	// import a mysql driver for database/sql
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // Route holds information about a specific message route handler
@@ -52,16 +57,45 @@ func New() *Mux {
 // ConnectDB will connect the multiplexer to a database that holds information
 // about the users on the discord server
 func (m *Mux) ConnectDB(filename string) {
-	DatabaseConnection, err := sql.Open("mysql", "user:password@/dbname")
+	file, err := os.Open(filename)
+
+	if err != nil {
+		log.Printf("Unable to open %v", filename)
+		return
+	}
+
+	defer file.Close()
+
+	data := struct {
+		Username, Password string
+	}{}
+
+	decoder := json.NewDecoder(file)
+
+	err = decoder.Decode(&data)
+
+	if err != nil {
+		log.Printf("Unable to parse %v", filename)
+		log.Println(err.Error())
+		os.Exit(1)
+	}
+
+	dsn := fmt.Sprintf("%v:%v@/chefbot", data.Username, data.Password)
+
+	DatabaseConnection, err := sql.Open("mysql", dsn)
 
 	if err != nil {
 		log.Printf("Error opening database")
+		log.Println(err.Error())
+		os.Exit(1)
 	}
 
 	err = DatabaseConnection.Ping()
 
 	if err != nil {
 		log.Printf("Error connecting to database")
+		log.Println(err.Error())
+		os.Exit(1)
 	}
 
 }

@@ -30,6 +30,7 @@ func init() {
 		flag.Parse()
 	}
 
+	Router.ConnectDB("config.secret")
 	mux.AddAllCommands(Router)
 }
 
