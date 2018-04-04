@@ -11,6 +11,9 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+// TODO Create logging package
+// TODO figure out the best way to do botwide constants i.e color for embeded messages
+
 // Version is a constant that store the version of ChefBot
 const Version = "v0.0.1-alpha"
 

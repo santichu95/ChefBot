@@ -1,7 +1,7 @@
 use chefbot;
 
 CREATE TABLE IF NOT EXISTS Currency (
-    ID int NOT NULL,
+    ID varchar(100) NOT NULL,
     Value int,
     PRIMARY KEY (ID)
 );

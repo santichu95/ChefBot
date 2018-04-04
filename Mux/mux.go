@@ -2,7 +2,6 @@ package mux
 
 import (
 	"database/sql"
-	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -26,14 +25,15 @@ type Route struct {
 // Context holds extra data that is passed along to route handlers
 // This way processing some of this only need to happen once
 type Context struct {
-	Fields          []string
-	Content         string
-	GuildID         string
-	IsDirected      bool
-	IsPrivate       bool
-	HasPrefix       bool
-	HasMention      bool
-	HasMentionFirst bool
+	Fields             []string
+	Content            string
+	DatabaseConnection *sql.DB
+	GuildID            string
+	IsDirected         bool
+	IsPrivate          bool
+	HasPrefix          bool
+	HasMention         bool
+	HasMentionFirst    bool
 }
 
 // HandlerFunc is the function signature required for a message route handler
@@ -44,7 +44,7 @@ type Mux struct {
 	Routes             []*Route
 	Default            *Route
 	Prefix             string
-	DatabaseConnection driver.Conn
+	DatabaseConnection *sql.DB
 }
 
 // New returns a new Discord message route mux
@@ -53,6 +53,8 @@ func New() *Mux {
 	m.Prefix = "*"
 	return m
 }
+
+// TODO return error and allow calling function to handle it
 
 // ConnectDB will connect the multiplexer to a database that holds information
 // about the users on the discord server
@@ -82,7 +84,7 @@ func (m *Mux) ConnectDB(filename string) {
 
 	dsn := fmt.Sprintf("%v:%v@/chefbot", data.Username, data.Password)
 
-	DatabaseConnection, err := sql.Open("mysql", dsn)
+	m.DatabaseConnection, err = sql.Open("mysql", dsn)
 
 	if err != nil {
 		log.Printf("Error opening database")
@@ -90,7 +92,7 @@ func (m *Mux) ConnectDB(filename string) {
 		os.Exit(1)
 	}
 
-	err = DatabaseConnection.Ping()
+	err = m.DatabaseConnection.Ping()
 
 	if err != nil {
 		log.Printf("Error connecting to database")
@@ -138,7 +140,8 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 
 	// Creating a context struct
 	ctx := &Context{
-		Content: strings.TrimSpace(mc.Content),
+		Content:            strings.TrimSpace(mc.Content),
+		DatabaseConnection: m.DatabaseConnection,
 	}
 
 	// TODO Add server specific prefixes
