@@ -87,7 +87,7 @@ func (m *Mux) ConnectDB(filename string) {
 	m.DatabaseConnection, err = sql.Open("mysql", dsn)
 
 	if err != nil {
-		log.Printf("Error opening database")
+		log.Print("Error opening database")
 		log.Println(err.Error())
 		os.Exit(1)
 	}
@@ -95,7 +95,7 @@ func (m *Mux) ConnectDB(filename string) {
 	err = m.DatabaseConnection.Ping()
 
 	if err != nil {
-		log.Printf("Error connecting to database")
+		log.Print("Error connecting to database")
 		log.Println(err.Error())
 		os.Exit(1)
 	}
@@ -160,12 +160,12 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 		// Try fetching via REST API
 		c, err = ds.Channel(mc.ChannelID)
 		if err != nil {
-			log.Printf("unable to fetch Channel for Message,", err)
+			log.Printf("unable to fetch Channel for Message, %v", err)
 		} else {
 			// Attempt to add this channel into our State
 			err = ds.State.ChannelAdd(c)
 			if err != nil {
-				log.Printf("error updatin State with Channel,", err)
+				log.Printf("error updatin State with Channel, %v", err)
 			}
 
 			// Add Channel info into Context
