@@ -8,7 +8,25 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// ListUserWallet will list the current value of the users wallet.
+// TODO create function to print error message to discord
+
+// GiveCurrency will give a given amount of currency from the author of the message
+// to the user who is mentioned.
+func GiveCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
+	log.Printf("Called GiveCurrency")
+	var userID string
+	var username *discordgo.User
+
+	if len(mc.Mentions) > 0 {
+		username = mc.Mentions[0]
+		userID = username.ID
+	} else {
+		// Error message about misused command
+		return
+	}
+}
+
+// ListUserWallet will list the current value of the users wallet.h
 func ListUserWallet(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
 	log.Printf("Called ListUserWallet")
 	// Figure out who to get information about
