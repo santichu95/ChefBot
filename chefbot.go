@@ -13,6 +13,7 @@ import (
 
 // TODO Create logging package
 // TODO figure out the best way to do botwide constants i.e color for embeded messages
+// TODO Add auth functionality to allow only certain users to call certain functions
 
 // Version is a constant that store the version of ChefBot
 const Version = "v0.0.1-alpha"
