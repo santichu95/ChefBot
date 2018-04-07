@@ -8,5 +8,7 @@ func AddAllCommands(r *Mux) error {
 	r.Route("take", "Take currency from a user", TakeCurrency)
 	r.Route("bf", "Take currency from a user", BetFlip)
 	r.Route("betflip", "Take currency from a user", BetFlip)
+	r.Route("lb", "Take currency from a user", ShowLeaderBoard)
+	r.Route("leaderboard", "Take currency from a user", ShowLeaderBoard)
 	return nil
 }

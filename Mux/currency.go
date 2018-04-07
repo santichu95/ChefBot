@@ -24,9 +24,54 @@ import (
 // TODO Wheel
 // TODO Slots
 
+// ShowLeaderBoard will display the leaderboard in chat
+// *lb <page>
+func ShowLeaderBoard(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
+	// TODO pagination
+	// Get info from database.
+	rows, err := ctx.DatabaseConnection.Query("SELECT * FROM Currency ORDER BY Value DESC limit 9")
+
+	if err != nil {
+		log.Printf("Error preparing query, %v", err.Error())
+		return
+	}
+
+	defer rows.Close()
+
+	var fields []*discordgo.MessageEmbedField
+	counter := 1
+	for rows.Next() {
+		var userID string
+		var wealth int
+		err = rows.Scan(&userID, &wealth)
+		log.Printf("#%v **%v** %v:cherry_blossom:", counter, userID, wealth)
+		fields = append(fields, &discordgo.MessageEmbedField{
+			Name:   fmt.Sprintf("#%v **%v**", counter, userID),
+			Value:  fmt.Sprintf("%v:cherry_blossom:", wealth),
+			Inline: true,
+		})
+		counter++
+	}
+
+	message := ":cherry_blossom: Leaderboard"
+	log.Print(message)
+	embed := &discordgo.MessageEmbed{
+		Author:      &discordgo.MessageEmbedAuthor{},
+		Color:       0xf47d42, // Peach
+		Fields:      fields,
+		Description: message,
+	}
+
+	_, err = ds.ChannelMessageSendEmbed(mc.ChannelID, embed)
+
+	if err != nil {
+		log.Printf("Unable to send embeded message, %v", err.Error())
+	}
+}
+
 // BetFlip will retrive a value and guess from the message, then flip a coin and will then reward/take acordingly.
 func BetFlip(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
-	payoutMulti := 1.9
+	payoutMulti := .9
 
 	log.Printf("Called BetFlip")
 
@@ -79,6 +124,7 @@ func BetFlip(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
 	// 0 <= tails < 50
 	// 50 <= heads < 100
 	if (flip < 50 && guess == tails) || (flip >= 50 && guess == heads) {
+		log.Print((int)(math.Round(payoutMulti * (float64)(bet))))
 		ChangeValue(ctx.DatabaseConnection, (int)(math.Round(payoutMulti*(float64)(bet))), userID)
 		message = fmt.Sprintf("<@%v> Correct! You won %v:cherry_blossom:", mc.Author.ID, (int)(math.Round(payoutMulti*(float64)(bet))))
 	} else {
@@ -310,8 +356,8 @@ func AlterUsersCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Conte
 
 // ChangeValue will alter the targetUserID's wallet by currencyDelta on the database pointed to by db
 func ChangeValue(db *sql.DB, currencyDelta int, targetUserID string) {
-	_, err := db.Exec(fmt.Sprintf("INSERT INTO Currency (ID, Value) VALUES (%v, %v) ON DUPLICATE KEY UPDATE Value=Value+%v;",
-		targetUserID, currencyDelta, targetUserID))
+	_, err := db.Exec(fmt.Sprintf("INSERT INTO Currency (ID, Value) VALUES (%v, %v) ON DUPLICATE KEY UPDATE Value=Value + %v;",
+		targetUserID, currencyDelta, currencyDelta))
 	if err != nil {
 		log.Printf("Error changing value(%v) for %v, %v", currencyDelta, targetUserID, err.Error())
 		return

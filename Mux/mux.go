@@ -138,6 +138,10 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 		return
 	}
 
+	// Check if the user has been seen
+	// if not seen, insert into DB
+	CheckForUser(m.DatabaseConnection, mc.Author)
+
 	// Creating a context struct
 	ctx := &Context{
 		Content:            strings.TrimSpace(mc.Content),
@@ -193,4 +197,30 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 // ListRoutes will list all of the routes into the chat
 func (m *Mux) ListRoutes(ds *discordgo.Session) {
 	log.Printf("Printing all of the routes to chat")
+}
+
+// TODO Abstract this to CheckIfExistsDatabase( <DB>, <table name>, <Primary Key>)
+
+// CheckForUser will query the database and return the value of the targetUserID's wallet
+// If that user is not in the database they will be added and given the starting amount of currency
+func CheckForUser(db *sql.DB, user *discordgo.User) error {
+	// TODO Change this into an upsert to keep track of changing usernames/discriminators
+	// Get info from database.
+	log.Printf("Checking for user in database")
+	err := db.QueryRow("SELECT * FROM Users WHERE ID = ?", user.ID).Scan()
+
+	if err == sql.ErrNoRows {
+		log.Print("No rows found")
+
+		_, err = db.Exec("INSERT INTO Users (ID, Username, Discriminator) VALUES(?, ?, ?)", user.ID, user.Username, user.Discriminator)
+		if err != nil {
+			log.Printf("Error inserting new user into database, %v", err.Error())
+			return err
+		}
+	} else if err != nil {
+		log.Printf("Error querying database, %v", err.Error())
+		return err
+	}
+
+	return nil
 }
