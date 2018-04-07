@@ -29,7 +29,7 @@ import (
 func ShowLeaderBoard(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
 	// TODO pagination
 	// Get info from database.
-	rows, err := ctx.DatabaseConnection.Query("SELECT * FROM Currency ORDER BY Value DESC limit 9")
+	rows, err := ctx.DatabaseConnection.Query("SELECT Value, Username, Discriminator FROM Currency JOIN Users USING (ID) ORDER BY Value DESC limit 9")
 
 	if err != nil {
 		log.Printf("Error preparing query, %v", err.Error())
@@ -41,12 +41,16 @@ func ShowLeaderBoard(ds *discordgo.Session, mc *discordgo.Message, ctx *Context)
 	var fields []*discordgo.MessageEmbedField
 	counter := 1
 	for rows.Next() {
-		var userID string
 		var wealth int
-		err = rows.Scan(&userID, &wealth)
-		log.Printf("#%v **%v** %v:cherry_blossom:", counter, userID, wealth)
+		var username string
+		var discriminator int
+		err = rows.Scan(&wealth, &username, &discriminator)
+		if err != nil {
+			log.Printf("Error processing row for leaderboard", err.Error())
+			continue
+		}
 		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:   fmt.Sprintf("#%v **%v**", counter, userID),
+			Name:   fmt.Sprintf("#%v **%v#%v**", counter, username, discriminator),
 			Value:  fmt.Sprintf("%v:cherry_blossom:", wealth),
 			Inline: true,
 		})
@@ -54,7 +58,6 @@ func ShowLeaderBoard(ds *discordgo.Session, mc *discordgo.Message, ctx *Context)
 	}
 
 	message := ":cherry_blossom: Leaderboard"
-	log.Print(message)
 	embed := &discordgo.MessageEmbed{
 		Author:      &discordgo.MessageEmbedAuthor{},
 		Color:       0xf47d42, // Peach
@@ -170,7 +173,6 @@ func TakeCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
 
 	AlterUsersCurrency(ds, mc, ctx, -1)
 
-	// Chat Message
 }
 
 // GiveCurrency will give a given amount of currency from the author of the message
@@ -285,6 +287,8 @@ func ListUserWallet(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) 
 	}
 }
 
+// TODO Abstract this to CheckIfExistsDatabase( <DB>, <table name>, <Primary Key>)
+
 // CheckForCurrency will query the database and return the value of the targetUserID's wallet
 // If that user is not in the database they will be added and given the starting amount of currency
 func CheckForCurrency(db *sql.DB, targetUserID string) (int, error) {
@@ -352,6 +356,27 @@ func AlterUsersCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Conte
 	deltaCurrency := (int)(math.Round(multiplier * (float64)(value)))
 
 	ChangeValue(ctx.DatabaseConnection, deltaCurrency, targetID)
+
+	var message string
+	if multiplier > 0 {
+		message = fmt.Sprintf("<@%v> has recieved %v :cherry_blossom:. Congratulations!", targetID, value)
+
+	} else {
+		message = fmt.Sprintf("<@%v> has lost %v :cherry_blossom:. What did you do?", targetID, value)
+	}
+
+	// Chat Message
+	embed := &discordgo.MessageEmbed{
+		Author:      &discordgo.MessageEmbedAuthor{},
+		Color:       0xf47d42, // Peach
+		Description: message,
+	}
+
+	_, err := ds.ChannelMessageSendEmbed(mc.ChannelID, embed)
+
+	if err != nil {
+		log.Printf("Unable to send embeded message, %v", err.Error())
+	}
 }
 
 // ChangeValue will alter the targetUserID's wallet by currencyDelta on the database pointed to by db
