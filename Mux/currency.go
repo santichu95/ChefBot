@@ -46,7 +46,7 @@ func ShowLeaderBoard(ds *discordgo.Session, mc *discordgo.Message, ctx *Context)
 		var discriminator int
 		err = rows.Scan(&wealth, &username, &discriminator)
 		if err != nil {
-			log.Printf("Error processing row for leaderboard", err.Error())
+			log.Printf("Error processing row for leaderboard, %v", err.Error())
 			continue
 		}
 		fields = append(fields, &discordgo.MessageEmbedField{
@@ -68,11 +68,11 @@ func ShowLeaderBoard(ds *discordgo.Session, mc *discordgo.Message, ctx *Context)
 	_, err = ds.ChannelMessageSendEmbed(mc.ChannelID, embed)
 
 	if err != nil {
-		log.Printf("Unable to send embeded message, %v", err.Error())
+		log.Printf("Unable to send embedded message, %v", err.Error())
 	}
 }
 
-// BetFlip will retrive a value and guess from the message, then flip a coin and will then reward/take acordingly.
+// BetFlip will retrive a value and guess from the message, then flip a coin and will then reward/take accordingly.
 func BetFlip(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
 	payoutMulti := .9
 
@@ -146,7 +146,7 @@ func BetFlip(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
 	_, err := ds.ChannelMessageSendEmbed(mc.ChannelID, embed)
 
 	if err != nil {
-		log.Printf("Unable to send embeded message, %v", err.Error())
+		log.Printf("Unable to send embedded message, %v", err.Error())
 	}
 }
 
@@ -283,7 +283,7 @@ func ListUserWallet(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) 
 	_, err = ds.ChannelMessageSendEmbed(mc.ChannelID, embed)
 
 	if err != nil {
-		log.Printf("Unable to send embeded message, %v", err.Error())
+		log.Printf("Unable to send embedded message, %v", err.Error())
 	}
 }
 
@@ -359,7 +359,7 @@ func AlterUsersCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Conte
 
 	var message string
 	if multiplier > 0 {
-		message = fmt.Sprintf("<@%v> has recieved %v :cherry_blossom:. Congratulations!", targetID, value)
+		message = fmt.Sprintf("<@%v> has received %v :cherry_blossom:. Congratulations!", targetID, value)
 
 	} else {
 		message = fmt.Sprintf("<@%v> has lost %v :cherry_blossom:. What did you do?", targetID, value)
@@ -375,7 +375,7 @@ func AlterUsersCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Conte
 	_, err := ds.ChannelMessageSendEmbed(mc.ChannelID, embed)
 
 	if err != nil {
-		log.Printf("Unable to send embeded message, %v", err.Error())
+		log.Printf("Unable to send embedded message, %v", err.Error())
 	}
 }
 
