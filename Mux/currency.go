@@ -247,7 +247,7 @@ func GiveCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
 	_, err = ds.ChannelMessageSendEmbed(mc.ChannelID, embed)
 
 	if err != nil {
-		log.Printf("Unable to send embeded message, %v", err.Error())
+		log.Printf("Unable to send embedded message, %v", err.Error())
 	}
 }
 
