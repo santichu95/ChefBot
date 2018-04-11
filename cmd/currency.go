@@ -1,6 +1,7 @@
-package mux
+package cmd
 
 import (
+	"ChefBot/framework"
 	"database/sql"
 	"fmt"
 	"log"
@@ -17,7 +18,7 @@ import (
 
 // ShowLeaderBoard will display the leaderboard in chat
 // *lb <page>
-func ShowLeaderBoard(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
+func ShowLeaderBoard(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context) {
 	// TODO pagination
 	// Get info from database.
 	rows, err := ctx.DatabaseConnection.Query("SELECT Value, Username, Discriminator FROM Currency JOIN Users USING (ID) ORDER BY Value DESC limit 9")
@@ -65,7 +66,7 @@ func ShowLeaderBoard(ds *discordgo.Session, mc *discordgo.Message, ctx *Context)
 
 // AwardCurrency will create a given amount of currency and give it to the user mentioned
 // Should only be used by Bot admins
-func AwardCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
+func AwardCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context) {
 	if mc.Author.ID != "179776524822642688" {
 		log.Printf("Award called by %v", mc.Author)
 		return
@@ -78,7 +79,7 @@ func AwardCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
 
 // TakeCurrency will create a given amount of currency and give it to the user mentioned
 // Should only be used by Bot admins
-func TakeCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
+func TakeCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context) {
 	if mc.Author.ID != "179776524822642688" {
 		log.Printf("Award called by %v", mc.Author)
 		return
@@ -91,7 +92,7 @@ func TakeCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
 // GiveCurrency will give a given amount of currency from the author of the message
 // to the user who is mentioned.
 // TODO Read the transaction value from message
-func GiveCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
+func GiveCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context) {
 	log.Printf("Called GiveCurrency")
 
 	fromUsername := mc.Author
@@ -165,7 +166,7 @@ func GiveCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
 }
 
 // ListUserWallet will list the current value of the users wallet.h
-func ListUserWallet(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
+func ListUserWallet(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context) {
 	log.Printf("Called ListUserWallet")
 	// Figure out who to get information about
 
@@ -238,7 +239,7 @@ func CheckForCurrency(db *sql.DB, targetUserID string) (int, error) {
 // AlterUsersCurrency will parse through ds, and mc to get a value from the message and then
 // make a change to the mentioned user. The value will be multiplied with the multipier to allow
 // both positive and negative changes.
-func AlterUsersCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *Context, multiplier float64) {
+func AlterUsersCurrency(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context, multiplier float64) {
 	var value int
 	var targetID string
 
