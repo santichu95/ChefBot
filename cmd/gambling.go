@@ -1,6 +1,7 @@
-package mux
+package cmd
 
 import (
+	"ChefBot/framework"
 	"fmt"
 	"log"
 	"math"
@@ -17,7 +18,7 @@ import (
 // TODO Slots
 
 // BetFlip will retrive a value and guess from the message, then flip a coin and will then reward/take accordingly.
-func BetFlip(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
+func BetFlip(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context) {
 	payoutMulti := .9
 
 	log.Printf("Called BetFlip")
@@ -95,7 +96,7 @@ func BetFlip(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
 }
 
 // BetRoll will retrieve a value and guess from the message, then flip a coin and will then reward/take accordingly.
-func BetRoll(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
+func BetRoll(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context) {
 	log.Printf("Called BetRoll")
 
 	username := mc.Author

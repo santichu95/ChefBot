@@ -1,4 +1,4 @@
-package mux
+package framework
 
 import (
 	"database/sql"
@@ -47,8 +47,8 @@ type Mux struct {
 	DatabaseConnection *sql.DB
 }
 
-// New returns a new Discord message route mux
-func New() *Mux {
+// NewMux returns a new Discord message route mux
+func NewMux() *Mux {
 	m := &Mux{}
 	m.Prefix = "*"
 	return m
