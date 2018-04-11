@@ -18,7 +18,7 @@ Discord bot centered around the currency system.
 | Mux/currency.go | 180 | Read the transaction value from message
 | Mux/currency.go | 232 | Ensure that these will both happen or neither will happen
 | Mux/currency.go | 273 | Print error message to discord
-| Mux/currency.go | 290 | Abstract this to CheckIfExistsDatabase( <DB>, <table name>, <Primary Key>)
+| Mux/currency.go | 290 | Abstract this to CheckIfExistsDatabase
 | Mux/currency.go | 310 | add a default value for users to start with
 | Mux/mux.go | 57 | return error and allow calling function to handle it
 | Mux/mux.go | 151 | Add server specific prefixes
