@@ -64,15 +64,16 @@ func main() {
 
 // addAllRoutes will add all of the commands to the mux
 func addAllRoutes(r *framework.Mux) error {
-	r.Route("$", "Display value of users wallet", cmd.ListUserWallet)
-	r.Route("give", "Give currency to another user", cmd.GiveCurrency)
-	r.Route("award", "Award currency to a user", cmd.AwardCurrency)
-	r.Route("take", "Take currency from a user", cmd.TakeCurrency)
-	r.Route("bf", "Make a bet on a flip of a coin", cmd.BetFlip)
-	r.Route("betflip", "Make a bet on a flip of a coin", cmd.BetFlip)
-	r.Route("lb", "Show a leaderboard of currency for the server", cmd.ShowLeaderBoard)
-	r.Route("leaderboard", "Show a leaderboard of currency for the server", cmd.ShowLeaderBoard)
-	r.Route("br", "Make a bet on the roll of a d100", cmd.BetRoll)
-	r.Route("betroll", "Make a bet on the roll of a d100", cmd.BetRoll)
+	r.Route([]string{"$"}, "Display value of users wallet", cmd.ListUserWallet)
+	r.Route([]string{"give"}, "Give currency to another user", cmd.GiveCurrency)
+	r.Route([]string{"award"}, "Award currency to a user", cmd.AwardCurrency)
+	r.Route([]string{"take"}, "Take currency from a user", cmd.TakeCurrency)
+	r.Route([]string{"bf", "betflip"}, "Make a bet on a flip of a coin", cmd.BetFlip)
+	r.Route([]string{"leaderboard", "lb"}, "Show a leaderboard of currency for the server", cmd.ShowLeaderBoard)
+	r.Route([]string{"br", "betroll"}, "Make a bet on the roll of a d100", cmd.BetRoll)
+	r.Route([]string{"test"}, "used to test commands", cmd.Play)
+
+	r.Route([]string{"suicide"}, "Provide a mentioned user with the suicide prevention hotline", cmd.Suicide)
+	r.Route([]string{"kys", "killyourself"}, "Provide a mentioned user with the price of rope at home depot", cmd.Kys)
 	return nil
 }

@@ -16,7 +16,7 @@ import (
 
 // Route holds information about a specific message route handler
 type Route struct {
-	Pattern     string
+	Pattern     []string
 	Description string
 	Help        string
 	Run         HandlerFunc
@@ -103,7 +103,7 @@ func (m *Mux) ConnectDB(filename string) {
 }
 
 // Route allows you to register a route
-func (m *Mux) Route(pattern, desc string, cb HandlerFunc) (*Route, error) {
+func (m *Mux) Route(pattern []string, desc string, cb HandlerFunc) (*Route, error) {
 
 	r := Route{}
 	r.Pattern = pattern
@@ -121,8 +121,10 @@ func (m *Mux) Match(msg string) (*Route, error) {
 	command := strings.Fields(msg)[0]
 
 	for _, routeValue := range m.Routes {
-		if routeValue.Pattern == command[1:] {
-			return routeValue, nil
+		for _, pattern := range routeValue.Pattern {
+			if pattern == command[1:] {
+				return routeValue, nil
+			}
 		}
 	}
 
