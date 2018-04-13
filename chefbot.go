@@ -73,7 +73,7 @@ func addAllRoutes(r *framework.Mux) error {
 	r.Route([]string{"br", "betroll"}, "Make a bet on the roll of a d100", cmd.BetRoll)
 	r.Route([]string{"test"}, "used to test commands", cmd.Play)
 
-	r.Route([]string{"suicide"}, "Provide a mentioned user with the suicide prevention hotline", cmd.Suicide)
-	r.Route([]string{"kys", "killyourself"}, "Provide a mentioned user with the price of rope at home depot", cmd.Kys)
+	addPersonalCommands(r)
+
 	return nil
 }
