@@ -3,7 +3,6 @@ package framework
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/url"
 	"os/exec"
 )
@@ -21,34 +20,15 @@ type (
 // If it was a search query it will query youtube and return a link to the first result
 func ParseYoutubeInput(input string) (string, error) {
 	url, err := url.ParseRequestURI(input)
+
 	if err == nil {
 		return url.String(), nil
 	}
-	cmd := exec.Command("youtube-dl", "--skip-download", "-default-search \"ytsearch\"", input)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err = cmd.Run()
-	str := out.String()
 
-	if err != nil {
-		return "", err
-	}
+	//TODO(sandaluz) search for the yt url based on keyword searches.
 
-	var resp struct {
-		_type string
-		id    string
-	}
-
-	err = json.Unmarshal([]byte(str), &resp)
-	if err != nil {
-		return "", err
-	}
-
-	if resp._type != "url" {
-		return "", errors.New("Error searching for a video")
-	}
-
-	return "youtu.be/" + resp.id, nil
+	//Temp video url
+	return "youtu.be/dQw4w9WgXcQ", nil
 }
 
 //GetVideoInfo will get a download url, the title of the video, and an error if onee arises.

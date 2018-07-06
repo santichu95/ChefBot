@@ -1,0 +1,2 @@
+go install ChefBot
+ChefBot

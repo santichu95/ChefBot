@@ -154,6 +154,7 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 	// If the message does not start with the bot prefix do nothing
 	if !strings.HasPrefix(ctx.Content, m.Prefix) {
 		log.Printf("Message missing bot prefix, %v", ctx.Content)
+		log.Printf("Author, %v;Time %v", mc.Author, mc.Timestamp)
 		return
 	}
 
@@ -162,12 +163,13 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 	var err error
 
 	c, err = ds.State.Channel(mc.ChannelID)
-	if err != nil {
+	if err == nil {
 		// Try fetching via REST API
 		c, err = ds.Channel(mc.ChannelID)
 		if err != nil {
 			log.Printf("unable to fetch Channel for Message, %v", err)
 		} else {
+			log.Println("OnMessageCreate")
 			// Attempt to add this channel into our State
 			err = ds.State.ChannelAdd(c)
 			if err != nil {
@@ -181,6 +183,8 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 				ctx.IsDirected = true
 			}
 		}
+	} else {
+		log.Println(err)
 	}
 
 	// Run the route that was found
