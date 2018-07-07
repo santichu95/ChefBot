@@ -7,14 +7,17 @@ import (
 	"os/exec"
 )
 
-type (
-	videoResponse struct {
-		Formats []struct {
-			URL string `json:"url"`
-		} `json:"formats"`
-		Title string `json:"title"`
-	}
-)
+type videoResponse struct {
+	Formats []struct {
+		URL string `json:"url"`
+	} `json:"formats"`
+	Title string `json:"title"`
+}
+
+// AudioItem  stores information about songs that are queued to play.
+type AudioItem struct {
+	vr videoResponse
+}
 
 // ParseYoutubeInput will parse the input and determine if it was a URL linking to a video or a search query,
 // If it was a search query it will query youtube and return a link to the first result

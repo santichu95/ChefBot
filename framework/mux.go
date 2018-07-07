@@ -34,6 +34,7 @@ type Context struct {
 	HasPrefix          bool
 	HasMention         bool
 	HasMentionFirst    bool
+	Info               *Store
 }
 
 // HandlerFunc is the function signature required for a message route handler
@@ -45,6 +46,12 @@ type Mux struct {
 	Default            *Route
 	Prefix             string
 	DatabaseConnection *sql.DB
+	Info               Store
+}
+
+// Store is a generic place to maintain long term information.
+type Store struct {
+	SongQueue map[string][]AudioItem
 }
 
 // NewMux returns a new Discord message route mux
@@ -148,6 +155,7 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 	ctx := &Context{
 		Content:            strings.TrimSpace(mc.Content),
 		DatabaseConnection: m.DatabaseConnection,
+		Info:               &m.Info,
 	}
 
 	// TODO Add server specific prefixes

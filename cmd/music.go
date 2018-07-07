@@ -59,8 +59,28 @@ func Disconnect(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Con
 	}
 }
 
+func findQueue(ctx *framework.Context) []framework.AudioItem {
+	if _, ok := ctx.Info.SongQueue[ctx.GuildID]; !ok {
+		ctx.Info.SongQueue[ctx.GuildID] = make([]framework.AudioItem, 0)
+	}
+	return ctx.Info.SongQueue[ctx.GuildID]
+}
+
 // Play ...
 func Play(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context) {
+	/*
+		// Find the queue for the server(GuildID)
+		queue := findQueue(ctx)
+
+		// Add song to queue
+		if len(queue) > 0 {
+		} else {
+			// Add song to queue and start audio transmition
+		}
+		// Create one if it does not exist
+		// Add song to queue, if empty beforehand start audio play back.
+		// TODO(sandaluz) figure out how to call another function at the end of streaming
+	*/
 
 	// Change these accordingly
 	options := dca.StdEncodeOptions
