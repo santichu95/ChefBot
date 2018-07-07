@@ -16,7 +16,7 @@ import (
 
 // Route holds information about a specific message route handler
 type Route struct {
-	Pattern     string
+	Pattern     []string
 	Description string
 	Help        string
 	Run         HandlerFunc
@@ -34,6 +34,7 @@ type Context struct {
 	HasPrefix          bool
 	HasMention         bool
 	HasMentionFirst    bool
+	Info               *Store
 }
 
 // HandlerFunc is the function signature required for a message route handler
@@ -45,6 +46,12 @@ type Mux struct {
 	Default            *Route
 	Prefix             string
 	DatabaseConnection *sql.DB
+	Info               Store
+}
+
+// Store is a generic place to maintain long term information.
+type Store struct {
+	SongQueue map[string][]AudioItem
 }
 
 // NewMux returns a new Discord message route mux
@@ -103,7 +110,7 @@ func (m *Mux) ConnectDB(filename string) {
 }
 
 // Route allows you to register a route
-func (m *Mux) Route(pattern, desc string, cb HandlerFunc) (*Route, error) {
+func (m *Mux) Route(pattern []string, desc string, cb HandlerFunc) (*Route, error) {
 
 	r := Route{}
 	r.Pattern = pattern
@@ -121,8 +128,10 @@ func (m *Mux) Match(msg string) (*Route, error) {
 	command := strings.Fields(msg)[0]
 
 	for _, routeValue := range m.Routes {
-		if routeValue.Pattern == command[1:] {
-			return routeValue, nil
+		for _, pattern := range routeValue.Pattern {
+			if pattern == command[1:] {
+				return routeValue, nil
+			}
 		}
 	}
 
@@ -146,12 +155,14 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 	ctx := &Context{
 		Content:            strings.TrimSpace(mc.Content),
 		DatabaseConnection: m.DatabaseConnection,
+		Info:               &m.Info,
 	}
 
 	// TODO Add server specific prefixes
 	// If the message does not start with the bot prefix do nothing
 	if !strings.HasPrefix(ctx.Content, m.Prefix) {
 		log.Printf("Message missing bot prefix, %v", ctx.Content)
+		log.Printf("Author, %v;Time %v", mc.Author, mc.Timestamp)
 		return
 	}
 
@@ -160,12 +171,13 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 	var err error
 
 	c, err = ds.State.Channel(mc.ChannelID)
-	if err != nil {
+	if err == nil {
 		// Try fetching via REST API
 		c, err = ds.Channel(mc.ChannelID)
 		if err != nil {
 			log.Printf("unable to fetch Channel for Message, %v", err)
 		} else {
+			log.Println("OnMessageCreate")
 			// Attempt to add this channel into our State
 			err = ds.State.ChannelAdd(c)
 			if err != nil {
@@ -179,6 +191,8 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 				ctx.IsDirected = true
 			}
 		}
+	} else {
+		log.Println(err)
 	}
 
 	// Run the route that was found

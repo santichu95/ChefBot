@@ -125,7 +125,7 @@ func BetRoll(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Contex
 	} else {
 		rand.Seed(time.Now().UnixNano())
 
-		roll := rand.Intn(100)
+		roll := rand.Intn(100) + 1
 
 		log.Printf("Rolled: %v", roll)
 		payoutMulti := -1

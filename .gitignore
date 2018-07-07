@@ -16,3 +16,7 @@
 # Secret files containing passwords and username for database.
 *.secret
 
+# Special commands for personal use
+meme.go
+chefbot.meme.go
+
