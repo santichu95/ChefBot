@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"ChefBot/cmd/currency"
 	"ChefBot/framework"
 	"fmt"
 	"log"
@@ -16,6 +17,7 @@ import (
 // TODO create all gambling functions
 // TODO Wheel
 // TODO Slots
+// TODO
 
 // BetFlip will retrive a value and guess from the message, then flip a coin and will then reward/take accordingly.
 func BetFlip(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context) {
@@ -73,10 +75,10 @@ func BetFlip(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Contex
 	// 50 <= heads < 100
 	if (flip < 50 && guess == tails) || (flip >= 50 && guess == heads) {
 		log.Print((int)(math.Round(payoutMulti * (float64)(bet))))
-		ChangeValue(ctx.DatabaseConnection, (int)(math.Round(payoutMulti*(float64)(bet))), userID)
+		currency.ChangeValue(ctx.DatabaseConnection, (int)(math.Round(payoutMulti*(float64)(bet))), userID)
 		message = fmt.Sprintf("<@%v> Correct! You won %v:cherry_blossom:", mc.Author.ID, (int)(math.Round((1+payoutMulti)*(float64)(bet))))
 	} else {
-		ChangeValue(ctx.DatabaseConnection, -1*bet, userID)
+		currency.ChangeValue(ctx.DatabaseConnection, -1*bet, userID)
 		message = fmt.Sprintf("<@%v> Thanks for the %v:cherry_blossom:! Better luck next time.", mc.Author.ID, bet)
 	}
 
@@ -117,7 +119,7 @@ func BetRoll(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Contex
 		return
 	}
 
-	authorWallet, err := CheckForCurrency(ctx.DatabaseConnection, userID)
+	authorWallet, err := currency.CheckForCurrency(ctx.DatabaseConnection, userID)
 
 	var message string
 	if bet > authorWallet {
@@ -140,7 +142,7 @@ func BetRoll(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Contex
 			payoutMulti = 10
 		}
 
-		ChangeValue(ctx.DatabaseConnection, payoutMulti*bet, userID)
+		currency.ChangeValue(ctx.DatabaseConnection, payoutMulti*bet, userID)
 		if payoutMulti < 0 {
 			message = fmt.Sprintf("%vThanks for the %v:cherry_blossom:!", message, bet)
 		} else {

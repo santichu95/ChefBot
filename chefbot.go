@@ -2,6 +2,7 @@ package main
 
 import (
 	"ChefBot/cmd"
+	"ChefBot/cmd/currency"
 	"ChefBot/framework"
 	"flag"
 	"fmt"
@@ -64,12 +65,12 @@ func main() {
 
 // addAllRoutes will add all of the commands to the mux
 func addAllRoutes(r *framework.Mux) error {
-	r.Route([]string{"$"}, "Display value of users wallet", cmd.ListUserWallet)
-	r.Route([]string{"give"}, "Give currency to another user", cmd.GiveCurrency)
-	r.Route([]string{"award"}, "Award currency to a user", cmd.AwardCurrency)
-	r.Route([]string{"take"}, "Take currency from a user", cmd.TakeCurrency)
+	r.Route([]string{"$"}, "Display value of users wallet", currency.ListUserWallet)
+	r.Route([]string{"give"}, "Give currency to another user", currency.GiveCurrency)
+	r.Route([]string{"award"}, "Award currency to a user", currency.AwardCurrency)
+	r.Route([]string{"take"}, "Take currency from a user", currency.TakeCurrency)
 	r.Route([]string{"bf", "betflip"}, "Make a bet on a flip of a coin", cmd.BetFlip)
-	r.Route([]string{"leaderboard", "lb"}, "Show a leaderboard of currency for the server", cmd.ShowLeaderBoard)
+	r.Route([]string{"leaderboard", "lb"}, "Show a leaderboard of currency for the server", currency.ShowLeaderBoard)
 	r.Route([]string{"br", "betroll"}, "Make a bet on the roll of a d100", cmd.BetRoll)
 	r.Route([]string{"test"}, "used to test commands", cmd.Play)
 	r.Route([]string{"summon"}, "Summons the bot into the voice channel you are in", cmd.Summon)
