@@ -1,0 +1,14 @@
+/* Currency */
+
+// TODO create function to print error message to discord
+// TODO GetValuesFromMessage
+// TODO GetMentionsFromMessage
+
+// TODO Abstract this to CheckIfExistsDatabase( <DB>, <table name>, <Primary Key>)
+
+/* Gambling */
+
+// TODO create all gambling functions
+// TODO Wheel
+// TODO Slots
+// TODO BlackJack
