@@ -1,9 +1,9 @@
 package main
 
 import (
-	"ChefBot/cmd"
 	"ChefBot/cmd/currency"
 	"ChefBot/cmd/gambling"
+	"ChefBot/cmd/music"
 	"ChefBot/framework"
 	"flag"
 	"fmt"
@@ -73,9 +73,9 @@ func addAllRoutes(r *framework.Mux) error {
 	r.Route([]string{"leaderboard", "lb"}, "Show a leaderboard of currency for the server", currency.ShowLeaderBoard)
 	r.Route([]string{"bf", "betflip"}, "Make a bet on a flip of a coin", gambling.BetFlip)
 	r.Route([]string{"br", "betroll"}, "Make a bet on the roll of a d100", gambling.BetRoll)
-	r.Route([]string{"test"}, "used to test commands", cmd.Play)
-	r.Route([]string{"summon"}, "Summons the bot into the voice channel you are in", cmd.Summon)
-	r.Route([]string{"disconnect"}, "Disconnects the bot from the voice channel", cmd.Disconnect)
+	r.Route([]string{"test"}, "used to test commands", music.Play)
+	r.Route([]string{"summon"}, "Summons the bot into the voice channel you are in", music.Summon)
+	r.Route([]string{"disconnect"}, "Disconnects the bot from the voice channel", music.Disconnect)
 
 	//addPersonalCommands(r)
 
