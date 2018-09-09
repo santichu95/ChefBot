@@ -77,7 +77,7 @@ func addAllRoutes(r *framework.Mux) error {
 	r.Route([]string{"summon"}, "Summons the bot into the voice channel you are in", music.Summon)
 	r.Route([]string{"disconnect"}, "Disconnects the bot from the voice channel", music.Disconnect)
 
-	//addPersonalCommands(r)
+	addPersonalCommands(r)
 
 	return nil
 }
