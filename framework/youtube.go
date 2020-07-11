@@ -2,21 +2,22 @@ package framework
 
 import (
 	"bytes"
-	"encoding/json"
+	"fmt"
+	"net/http"
 	"net/url"
 	"os/exec"
+	"strings"
+
+	"google.golang.org/api/googleapi/transport"
+	"google.golang.org/api/youtube/v3"
 )
 
-type videoResponse struct {
-	Formats []struct {
-		URL string `json:"url"`
-	} `json:"formats"`
-	Title string `json:"title"`
-}
-
-// AudioItem  stores information about songs that are queued to play.
-type AudioItem struct {
-	vr videoResponse
+// VideoInfo stores information needed to display in discord
+// TODO(sandaluz) add the information about who added this song to the queue
+type VideoInfo struct {
+	URL   string
+	Title string
+	ID    string
 }
 
 // ParseYoutubeInput will parse the input and determine if it was a URL linking to a video or a search query,
@@ -28,31 +29,53 @@ func ParseYoutubeInput(input string) (string, error) {
 		return url.String(), nil
 	}
 
-	//TODO(sandaluz) search for the yt url based on keyword searches.
+	id := Search(input)
 
-	//Temp video url
-	return "youtu.be/dQw4w9WgXcQ", nil
+	return "youtu.be/" + id, nil
 }
 
-//GetVideoInfo will get a download url, the title of the video, and an error if onee arises.
-func GetVideoInfo(input string) (string, string, error) {
-	cmd := exec.Command("youtube-dl", "--skip-download", "--print-json", "--flat-playlist", input)
+// Search ...
+func Search(query string) string {
+	developerKey := "AIzaSyDyWX6x3Ak9i0P7o1QPN0BKG0IB9PjZuk8"
+
+	client := &http.Client{
+		Transport: &transport.APIKey{Key: developerKey},
+	}
+
+	service, err := youtube.New(client)
+	if err != nil {
+		fmt.Println("Error creating new YouTube client: %v", err)
+	}
+
+	// Make the API call to YouTube.
+	call := service.Search.List("id,snippet").
+		Q(query).
+		MaxResults(1)
+	response, err := call.Do()
+	if err != nil {
+		fmt.Println("Error creating new YouTube client: %v", err)
+	}
+
+	//TODO get video title
+	return response.Items[0].Id.VideoId
+}
+
+// DownloadVideo ...
+func DownloadVideo(input string) (*VideoInfo, error) {
+	cmd := exec.Command("youtube-dl", "-f", "140", "-o", "%(id)s", input)
+	fmt.Println(cmd)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
 
+	videoInfo := new(VideoInfo)
 	if err != nil {
-		return "", "", err
+		return videoInfo, err
 	}
 
-	str := out.String()
+	videoInfo.URL = input
+	videoInfo.Title = "Filler"
+	videoInfo.ID = strings.Split(input, "=")[1]
 
-	var resp videoResponse
-	err = json.Unmarshal([]byte(str), &resp)
-	if err != nil {
-		return "", "", err
-	}
-
-	return resp.Formats[0].URL, resp.Title, nil
-
+	return videoInfo, nil
 }

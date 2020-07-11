@@ -5,7 +5,6 @@ import (
 	"ChefBot/cmd/gambling"
 	"ChefBot/cmd/music"
 	"ChefBot/framework"
-	"flag"
 	"fmt"
 	"os"
 	"os/signal"
@@ -31,11 +30,6 @@ var (
 
 func init() {
 	Token = os.Getenv("DG_TOKEN")
-
-	if Token == "" {
-		flag.StringVar(&Token, "t", "", "Discord Authentication Token")
-		flag.Parse()
-	}
 
 	Router.ConnectDB("config.secret")
 	addAllRoutes(Router)

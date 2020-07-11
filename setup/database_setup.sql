@@ -4,4 +4,4 @@ CREATE DATABASE chefbot;
 
 USE chefbot;
 
-source table_setup.mysql;
+source ./table_setup.sql;

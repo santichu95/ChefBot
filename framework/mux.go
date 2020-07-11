@@ -46,18 +46,23 @@ type Mux struct {
 	Default            *Route
 	Prefix             string
 	DatabaseConnection *sql.DB
-	Info               Store
+	Info               *Store
 }
 
 // Store is a generic place to maintain long term information.
 type Store struct {
-	SongQueue map[string][]AudioItem
+	SongQueue      map[string][]VideoInfo
+	AudioIsPlaying map[string]bool
 }
 
 // NewMux returns a new Discord message route mux
 func NewMux() *Mux {
 	m := &Mux{}
 	m.Prefix = "*"
+	emptyInfo := Store{
+		SongQueue:      make(map[string][]VideoInfo),
+		AudioIsPlaying: make(map[string]bool)}
+	m.Info = &emptyInfo
 	return m
 }
 
@@ -155,7 +160,7 @@ func (m *Mux) OnMessageCreate(ds *discordgo.Session, mc *discordgo.MessageCreate
 	ctx := &Context{
 		Content:            strings.TrimSpace(mc.Content),
 		DatabaseConnection: m.DatabaseConnection,
-		Info:               &m.Info,
+		Info:               m.Info,
 	}
 
 	// TODO Add server specific prefixes
