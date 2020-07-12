@@ -10,23 +10,28 @@ import (
 
 // Play ...
 func Play(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context) {
-	log.Println("Finding youtubeURL")
-	youtubeURL, err := framework.ParseYoutubeInput(strings.Join(strings.Fields(mc.Content)[1:], " "))
-
-	if err != nil {
-		log.Println("Error searching for the YT Url")
-		log.Println(err.Error())
+	userInput := strings.Fields(mc.Content)
+	if len(userInput) <= 1 {
+		// Do nothing if we see no additional input other than the command.
+		return
 	}
+	input := strings.Join(userInput[1:], " ")
 
 	log.Println("Downloading video")
-	videoInfo, err := framework.DownloadVideo(youtubeURL)
+	videoInfo, err := framework.DownloadYoutubeVideo(input)
+
 	if err != nil {
 		log.Println("Error downloading video")
 		log.Println(err.Error())
+		return
 	}
 
-	go func() {
-		framework.Insert(videoInfo, mc, ctx)
-		framework.MaybePlaySong(ds, mc, ctx)
-	}()
+	for i, vi := range *videoInfo {
+		if i == 0 {
+			go func() {
+				framework.MaybePlaySong(ds, mc, ctx)
+			}()
+		}
+		framework.Insert(&vi, mc, ctx)
+	}
 }

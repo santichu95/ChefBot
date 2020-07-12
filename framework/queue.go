@@ -39,7 +39,7 @@ func MaybePlaySong(ds *discordgo.Session, mc *discordgo.Message, ctx *Context) {
 	stopPlaying := make(chan bool)
 	go func() {
 		ctx.Info.AudioIsPlaying[mc.GuildID] = true
-		dgvoice.PlayAudioFile(vc, frontOfQueue.ID, stopPlaying)
+		dgvoice.PlayAudioFile(vc, "audio_cache/"+frontOfQueue.ID, stopPlaying)
 		ctx.Info.AudioIsPlaying[mc.GuildID] = false
 		// Remove recently finished song from queue.
 		RemoveSong(mc.GuildID, ctx.Info)
