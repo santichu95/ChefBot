@@ -21,8 +21,12 @@ func Play(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context) 
 		return
 	}
 
-	go func() {
-		framework.Insert(videoInfo, mc, ctx)
-		framework.MaybePlaySong(ds, mc, ctx)
-	}()
+	for i, vi := range *videoInfo {
+		if i == 0 {
+			go func() {
+				framework.MaybePlaySong(ds, mc, ctx)
+			}()
+		}
+		framework.Insert(&vi, mc, ctx)
+	}
 }
