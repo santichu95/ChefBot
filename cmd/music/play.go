@@ -10,7 +10,12 @@ import (
 
 // Play ...
 func Play(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context) {
-	input := strings.Join(strings.Fields(mc.Content)[1:], " ")
+	userInput := strings.Fields(mc.Content)
+	if len(userInput) <= 1 {
+		// Do nothing if we see no additional input other than the command.
+		return
+	}
+	input := strings.Join(userInput[1:], " ")
 
 	log.Println("Downloading video")
 	videoInfo, err := framework.DownloadYoutubeVideo(input)
