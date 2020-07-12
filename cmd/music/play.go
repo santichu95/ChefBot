@@ -10,19 +10,15 @@ import (
 
 // Play ...
 func Play(ds *discordgo.Session, mc *discordgo.Message, ctx *framework.Context) {
-	log.Println("Finding youtubeURL")
-	youtubeURL, err := framework.ParseYoutubeInput(strings.Join(strings.Fields(mc.Content)[1:], " "))
-
-	if err != nil {
-		log.Println("Error searching for the YT Url")
-		log.Println(err.Error())
-	}
+	input := strings.Join(strings.Fields(mc.Content)[1:], " ")
 
 	log.Println("Downloading video")
-	videoInfo, err := framework.DownloadVideo(youtubeURL)
+	videoInfo, err := framework.DownloadYoutubeVideo(input)
+
 	if err != nil {
 		log.Println("Error downloading video")
 		log.Println(err.Error())
+		return
 	}
 
 	go func() {
